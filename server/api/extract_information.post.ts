@@ -31,22 +31,33 @@ export default defineEventHandler(async (event) => {
 
   const json: ExtractionItem[] = JSON.parse(extractionItems[0])
 
+  const returnJson = []
+
   for (const file of Object.values(files)) {
     if (file === undefined) continue
 
+    var item = {}
+
     const pdfPath = file[0].filepath
+    const originalFilename = file[0].originalFilename
 
     const docs = await indexingLoadDocuments(pdfPath)
     const allSplits = await indexingSplitDocuments(docs)
     const vectorStore = await indexingStoreVectors(allSplits)
 
+    const resultObject: { filename: string | null; [key: string]: any } = { filename: originalFilename }
+
     for (const item of json) {
-      const query = 'Question:' + item.question + '\n Return Type:' + item.return_type
       const result = await retrieveDocumentsAndGenerate(vectorStore, item.question, item.return_type)
+      
       console.log(result)
+      resultObject[item.title] = result
     }
-    break
+
+    returnJson.push(resultObject)
   }
+
+  return returnJson
 })
 
 async function indexingLoadDocuments(pdfPath: string) {

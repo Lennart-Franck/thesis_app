@@ -13,14 +13,22 @@ export default defineEventHandler(async (event) => {
     event,
   );
 
+  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
   for (const row of json) {
     const criteriaText = `Title: ${row.Title}\nYear: ${row.Year}\nKeywords: ${row.Keywords}\nAbstract: ${row.Abstract}`;
+
+    let includeCount = 0;
+    let excludeCount = 0;
 
     for (const criteria of includeCriteria) {
       const result = await isCriteriaMet(criteria, criteriaText);
       row[criteria] = result.decision;
       row[`${criteria} Explanation`] = result.explanation;
       row[`${criteria} Confidence`] = result.score;
+      if (result.decision === 'yes') {
+        includeCount++;
+      }
     }
 
     for (const criteria of excludeCriteria) {
@@ -28,7 +36,21 @@ export default defineEventHandler(async (event) => {
       row[criteria] = result.decision;
       row[`${criteria} Explanation`] = result.explanation;
       row[`${criteria} Confidence`] = result.score;
+      if (result.decision === 'no') {
+        excludeCount++;
+      }
     }
+
+    const includeCriteriaMet = includeCount === includeCriteria.length; 
+    const excludeCriteriaMet = excludeCount === excludeCriteria.length;
+
+    if (includeCriteriaMet && excludeCriteriaMet) {
+      row['Suggested Prediction'] = 'Include';
+    } else {
+      row['Suggested Prediction'] = 'Exclude';
+    }
+
+    await delay(10000); // 10 Sekunden Wartezeit für Ratelimit
   }
 
   return json;

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import Papa from 'papaparse';
 
 const toast = useToast()
@@ -16,7 +16,6 @@ const { files, open, reset, onChange } = useFileDialog(
 )
 
 async function sortPapers() {
-
   if (files.value === null || files.value.length === 0) {
     toast.add({
       title: 'Error',
@@ -36,14 +35,14 @@ async function sortPapers() {
     return
   }
 
-  isLoading.value = true
-
   try {
-
+    
     Papa.parse(files.value[0], {
       header: true,
       delimiter: ";",
       complete: async function (results) {
+        isLoading.value = true
+        
         const file = results.data;
 
         const body = await $fetch('/api/criteria_matching', {
@@ -62,30 +61,45 @@ async function sortPapers() {
 
         var csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         var csvURL = null;
-        if (navigator.msSaveBlob) {
-          csvURL = navigator.msSaveBlob(csvData, 'download.csv');
-        } else {
-          csvURL = window.URL.createObjectURL(csvData);
-        }
+
+        csvURL = window.URL.createObjectURL(csvData);
+
         var tempLink = document.createElement('a');
         tempLink.href = csvURL;
         tempLink.setAttribute('download', 'download.csv');
         tempLink.click();
+
+        toast.add({
+          title: 'Success',
+          description: 'The papers have been sorted successfully. The file is downloaded.',
+          color: "green"
+        });
+
+        isLoading.value = false
+
       }
     });
 
-  } catch (error) {
+  } catch (error: any) {
     toast.add({
       title: 'Error',
       description: error,
     })
+  } finally {
+    isLoading.value = false
   }
-  isLoading.value = false
 }
+
 </script>
 
 <template>
   <div>
+
+    <Head>
+      <Title>
+        Paper Sorting
+      </Title>
+    </Head>
     <header class="bg-white mt-12">
 
       <h1 class="text-3xl font-bold text-gray-900 mb-4">Sorting Papers based on Criteria</h1>
@@ -111,7 +125,7 @@ async function sortPapers() {
 
     </div>
 
-    <div class="my-12">
+    <div class="my-12" v-if="files">
       <p class="text-xl text-gray-900 mt-4">2. Define Include Criteria:</p>
       <p class="text-sm text-gray-500">Please add the criteria that you want to include in the sorting process. You can
         add as many as you like.</p>
@@ -127,7 +141,7 @@ async function sortPapers() {
       <UButton @click="includeCriteria.push(null)" class="my-2">Add criteria</UButton>
     </div>
 
-    <div class="my-12">
+    <div class="my-12" v-if="files">
       <p class="text-xl text-gray-900 mt-4">3. Define Exclude Criteria:</p>
       <p class="text-sm text-gray-500">Please add the criteria that you want to exclude in the sorting process. You can
         add as many as you like.</p>
@@ -143,7 +157,7 @@ async function sortPapers() {
       <UButton @click="excludeCriteria.push(null)" class="my-2">Add criteria</UButton>
     </div>
 
-    <div class="my-12">
+    <div class="my-12" v-if="includeCriteria.length > 1 || excludeCriteria.length > 1">
       <p class="text-xl text-gray-900 mt-4">4. Sort Papers:</p>
       <p class="text-sm text-gray-500">Click the button below to sort the papers based on the criteria you defined
         above. This may take some time. The file will be downloaded.</p>

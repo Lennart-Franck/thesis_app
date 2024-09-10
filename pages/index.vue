@@ -145,6 +145,11 @@ function copyToClipboard(text: string) {
 </script>
 
 <template>
+  <Head>
+    <Title>
+      Research Questions and Search String
+    </Title>
+  </Head>
   <div class="mb-20">
 
     <header class="bg-white mt-12">
@@ -202,15 +207,15 @@ function copyToClipboard(text: string) {
     </div>
 
 
-    <div v-if="searchString" class="my-8">
+    <div v-if="keywords" class="my-8">
       <p class="text-xl text-gray-900">4. Search String:</p>
       <p class="text-gray-500 text-sm mb-4">Finally, we help you create the search string based on the selected keywords
       </p>
 
-      <UButton label="Create Search String" v-if="keywords" :loading="isSearchStringLoading"
+      <UButton label="Create Search String" :loading="isSearchStringLoading"
         @click="createSearchString" />
 
-      <div class="mt-4">
+      <div class="mt-4" v-if="searchString">
 
         <UTextarea v-model="searchString" class="w-full" />
         <UButton class="mt-2" label="Copy to Clipboard" @click="copyToClipboard(searchString)" />

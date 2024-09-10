@@ -1,13 +1,13 @@
 export interface ExtractionItem {
-  title: string;
-  question: string;
-  return_type: string;
+  title: string
+  question: string
+  return_type: string
 }
 
 export const extractionItems: ExtractionItem[] = [
   {
-    title: "SWEBOK Category Identification",
-    question: "Which SWEBOK category (or categories) does this study primarily address?",
+    title: 'SWEBOK Category Identification',
+    question: 'Which SWEBOK category (or categories) does this study primarily address?',
     return_type: `One or more of the following categories: 
       "Software Requirements",
       "Software Design",
@@ -23,11 +23,11 @@ export const extractionItems: ExtractionItem[] = [
       "Software Engineering Economics",
       "Computing Foundations",
       "Mathematical Foundations",
-      "Engineering Foundations"`
+      "Engineering Foundations"`,
   },
   {
-    title: "Research Method Identification",
-    question: "What research method does this study employ?",
+    title: 'Research Method Identification',
+    question: 'What research method does this study employ?',
     return_type: `One of the following categories:
       "Experiment",
       "Case Study",
@@ -39,11 +39,12 @@ export const extractionItems: ExtractionItem[] = [
       "Meta-Analysis",
       "Simulation",
       "Field Study",
-      "Formal Methods"`
-  }, {
-  title: "Research Type Identification",
-  question: "What research type does this study represent?",
-  return_type: `One of the following types:
+      "Formal Methods"`,
+  },
+  {
+    title: 'Research Type Identification',
+    question: 'What research type does this study represent?',
+    return_type: `One of the following types:
     "Qualitative",
     "Quantitative",
     "Mixed Methods",
@@ -53,6 +54,11 @@ export const extractionItems: ExtractionItem[] = [
     "Descriptive",
     "Exploratory",
     "Explanatory",
-    "Evaluative"`
-}
-];
+    "Evaluative"`,
+  },
+  {
+    title: 'Technology Used',
+    question: 'Which technologies, tools, or frameworks are utilized or discussed in this study?',
+    return_type: 'String',
+  },
+]
